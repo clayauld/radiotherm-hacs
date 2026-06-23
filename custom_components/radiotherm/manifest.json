@@ -1,7 +1,9 @@
 {
   "domain": "radiotherm",
   "name": "Radio Thermostat",
-  "codeowners": ["@vinnyfuria"],
+  "codeowners": [
+    "@vinnyfuria"
+  ],
   "config_flow": true,
   "dhcp": [
     {
@@ -15,7 +17,11 @@
   "documentation": "https://github.com/clayauld/radiotherm-hacs",
   "integration_type": "device",
   "iot_class": "local_polling",
-  "version": "1.0.0",
-  "loggers": ["radiotherm"],
-  "requirements": ["radiotherm==2.1.0"]
+  "loggers": [
+    "radiotherm"
+  ],
+  "requirements": [
+    "radiotherm==2.1.0"
+  ],
+  "version": "1.0.0"
 }

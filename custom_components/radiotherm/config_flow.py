@@ -65,7 +65,7 @@ class RadioThermConfigFlow(ConfigFlow, domain=DOMAIN):
         return await self.async_step_confirm()
 
     async def async_step_confirm(
-        self, user_input: dict[str, Any] | None = None
+        self, user_input: Optional[dict[str, Any]] = None
     ) -> ConfigFlowResult:
         """Attempt to confirm."""
         ip_address = self.discovered_ip
@@ -92,7 +92,7 @@ class RadioThermConfigFlow(ConfigFlow, domain=DOMAIN):
 
     @override
     async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
+        self, user_input: Optional[dict[str, Any]] = None
     ) -> ConfigFlowResult:
         """Handle the initial step."""
         errors = {}
