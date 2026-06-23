@@ -95,7 +95,8 @@ class MockRadiothermTstatError(Exception):
 radiotherm_validate.RadiothermTstatError = MockRadiothermTstatError
 
 
-# Real classes for CT80 and CT30 to support isinstance() checks
+# Real classes for CT80, CT30, and CommonThermostat to
+# support isinstance() checks and spec'ing
 class CT80:
     pass
 
@@ -104,8 +105,13 @@ class CT30:
     pass
 
 
+class CommonThermostat:
+    pass
+
+
 radiotherm_thermostat.CT80 = CT80
 radiotherm_thermostat.CT30 = CT30
+radiotherm_thermostat.CommonThermostat = CommonThermostat
 
 # Mock specific imports and structures used inside the component
 const.CONF_HOST = "host"
