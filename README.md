@@ -12,6 +12,10 @@ A custom integration for wifi-enabled Radio Thermostat devices (Filtrete 3M50, C
 - **Local Control:** Communicates directly with the thermostat's API over your local network.
 - **Modern Compatibility:** Native support for the modern `ClimateEntityFeature` bitmasks.
 
+## Versatile Thermostat Compatibility
+
+This integration includes a built-in runtime patch for the **Versatile Thermostat** custom integration. When this integration loads, it dynamically monkey-patches `versatile_thermostat`'s underlying climate handler to cast the `supported_features` attribute to `ClimateEntityFeature`. This resolves the `TypeError: argument of type 'int' is not a container or iterable` crash that occurs when adjusting target temperatures of `over_climate` devices in Versatile Thermostat.
+
 ## Installation
 
 ### Method 1: HACS (Recommended)

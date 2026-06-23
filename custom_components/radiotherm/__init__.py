@@ -17,6 +17,27 @@ from .util import async_set_time
 PLATFORMS: list[Platform] = [Platform.CLIMATE, Platform.SWITCH]
 
 
+# Monkey patch versatile_thermostat to avoid TypeError when evaluating
+# ClimateEntityFeature.TARGET_TEMPERATURE_RANGE in self.supported_features.
+try:
+    from custom_components.versatile_thermostat.underlyings import (
+        UnderlyingClimate,
+    )
+    from homeassistant.components.climate import ClimateEntityFeature
+
+    @property
+    def patched_supported_features(self) -> ClimateEntityFeature:
+        """Get supported features, casting raw ints to ClimateEntityFeature."""
+        features = self.get_underlying_attribute("supported_features")
+        if features is not None:
+            return ClimateEntityFeature(features)
+        return ClimateEntityFeature(0)
+
+    UnderlyingClimate.supported_features = patched_supported_features
+except Exception:  # pylint: disable=broad-except
+    pass
+
+
 _T = TypeVar("_T")
 
 
