@@ -1,7 +1,7 @@
 """Config flow for Radio Thermostat integration."""
 
 import logging
-from typing import Any
+from typing import Any, Optional
 
 try:
     from typing import override
@@ -43,8 +43,8 @@ class RadioThermConfigFlow(ConfigFlow, domain=DOMAIN):
 
     def __init__(self) -> None:
         """Initialize ConfigFlow."""
-        self.discovered_ip: str | None = None
-        self.discovered_init_data: RadioThermInitData | None = None
+        self.discovered_ip: Optional[str] = None
+        self.discovered_init_data: Optional[RadioThermInitData] = None
 
     @override
     async def async_step_dhcp(
