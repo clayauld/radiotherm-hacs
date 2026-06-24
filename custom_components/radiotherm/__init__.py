@@ -10,6 +10,7 @@ from homeassistant.const import CONF_HOST, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
+from .const import CONF_SYNC_TIME, DOMAIN
 from .coordinator import RadioThermConfigEntry, RadioThermUpdateCoordinator
 from .data import async_get_init_data
 from .util import async_set_time
@@ -65,14 +66,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: RadioThermConfigEntry) -
     init_data = await _async_call_or_raise_not_ready(init_coro, host)
     coordinator = RadioThermUpdateCoordinator(hass, entry, init_data)
     await coordinator.async_config_entry_first_refresh()
-
-    # Only set the time if the thermostat is
-    # not in hold mode since setting the time
-    # clears the hold for some strange design
-    # choice
-    if not coordinator.data.tstat["hold"]:
-        time_coro = async_set_time(hass, init_data.tstat)
-        await _async_call_or_raise_not_ready(time_coro, host)
 
     entry.runtime_data = coordinator
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

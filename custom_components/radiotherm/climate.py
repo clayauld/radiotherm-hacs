@@ -22,10 +22,12 @@ from homeassistant.components.climate import (
 )
 from homeassistant.const import ATTR_TEMPERATURE, PRECISION_HALVES, UnitOfTemperature
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .coordinator import RadioThermConfigEntry, RadioThermUpdateCoordinator
 from .entity import RadioThermostatEntity
+from .util import async_set_time
 
 ATTR_FAN_ACTION = "fan_action"
 
@@ -107,6 +109,13 @@ async def async_setup_entry(
 ) -> None:
     """Set up climate for a radiotherm device."""
     async_add_entities([RadioThermostat(entry.runtime_data)])
+
+    platform = entity_platform.async_get_current_platform()
+    platform.async_register_entity_service(
+        "sync_time",
+        {},
+        "async_sync_time",
+    )
 
 
 class RadioThermostat(RadioThermostatEntity, ClimateEntity):
@@ -235,3 +244,7 @@ class RadioThermostat(RadioThermostatEntity, ClimateEntity):
         """Set Preset mode (Home, Alternate, Away, Holiday)."""
         assert isinstance(self.device, radiotherm.thermostat.CT80)
         self.device.program_mode = PRESET_MODE_TO_CODE[preset_mode]
+
+    async def async_sync_time(self) -> None:
+        """Sync time on the thermostat."""
+        await async_set_time(self.hass, self.device, self.data.tstat.get("hold", False))

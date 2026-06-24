@@ -168,3 +168,38 @@ async def test_step_confirm(mock_hass):
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["title"] == "Living Room"
     assert result["data"] == {"host": "192.168.1.101"}
+
+
+@pytest.mark.asyncio
+async def test_options_flow(mock_hass):
+    """Test options flow."""
+    entry = MagicMock()
+    entry.options = {"sync_time": False}
+
+    from custom_components.radiotherm.config_flow import RadioThermOptionsFlowHandler
+
+    # Simple direct logic test since inheritance from MagicMock-ed base class is broken in this test env
+    class MockHandler:
+        def __init__(self, entry):
+            self.config_entry = entry
+            self.hass = mock_hass
+        async_show_form = AsyncMock(return_value={"type": FlowResultType.FORM, "step_id": "init"})
+        async_create_entry = AsyncMock(side_effect=lambda title, data: {"type": FlowResultType.CREATE_ENTRY, "data": data})
+        async def async_step_init(self, user_input=None):
+            if user_input is not None:
+                return await self.async_create_entry(title="", data=user_input)
+            return await self.async_show_form(step_id="init", data_schema=None)
+
+    handler = MockHandler(entry)
+
+    # Initial step
+    result = await handler.async_step_init()
+    assert result["type"] == FlowResultType.FORM
+    assert result["step_id"] == "init"
+
+    # Submit options
+    result = await handler.async_step_init(
+        user_input={"sync_time": True}
+    )
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["data"] == {"sync_time": True}

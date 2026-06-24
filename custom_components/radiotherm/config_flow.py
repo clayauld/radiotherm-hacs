@@ -12,13 +12,18 @@ from urllib.error import URLError
 from radiotherm.validate import RadiothermTstatError
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlow,
+)
 from homeassistant.const import CONF_HOST
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
 
-from .const import DOMAIN
+from .const import CONF_SYNC_TIME, DOMAIN
 from .data import RadioThermInitData, async_get_init_data
 
 _LOGGER = logging.getLogger(__name__)
@@ -40,6 +45,14 @@ class RadioThermConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Radio Thermostat."""
 
     VERSION = 1
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(
+        config_entry: ConfigEntry,
+    ) -> OptionsFlow:
+        """Create the options flow."""
+        return RadioThermOptionsFlowHandler(config_entry)
 
     def __init__(self) -> None:
         """Initialize ConfigFlow."""
@@ -119,4 +132,31 @@ class RadioThermConfigFlow(ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=vol.Schema({vol.Required(CONF_HOST): str}),
             errors=errors,
+        )
+
+
+class RadioThermOptionsFlowHandler(OptionsFlow):
+    """Handle Radio Thermostat options."""
+
+    def __init__(self, config_entry: ConfigEntry) -> None:
+        """Initialize options flow."""
+        self.config_entry = config_entry
+
+    async def async_step_init(
+        self, user_input: Optional[dict[str, Any]] = None
+    ) -> ConfigFlowResult:
+        """Manage the options."""
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        CONF_SYNC_TIME,
+                        default=self.config_entry.options.get(CONF_SYNC_TIME, True),
+                    ): bool,
+                }
+            ),
         )
