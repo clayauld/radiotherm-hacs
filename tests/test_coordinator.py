@@ -1,15 +1,16 @@
 """Test coordinator of Radio Thermostat integration."""
 
-from unittest.mock import MagicMock, patch, AsyncMock
-import pytest
+from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+from homeassistant.helpers.update_coordinator import UpdateFailed
 from radiotherm.validate import RadiothermTstatError
+
 from custom_components.radiotherm.coordinator import (
-    RadioThermUpdateCoordinator,
     UPDATE_INTERVAL,
+    RadioThermUpdateCoordinator,
 )
 from custom_components.radiotherm.data import RadioThermUpdate
-from homeassistant.helpers.update_coordinator import UpdateFailed
 
 
 @pytest.fixture
@@ -45,18 +46,25 @@ async def test_coordinator_init(mock_hass, mock_init_data):
 async def test_coordinator_update_data_success(mock_hass, mock_init_data):
     """Test successful data update."""
     entry = MagicMock()
+    entry.options = {}
     coordinator = RadioThermUpdateCoordinator(mock_hass, entry, mock_init_data)
 
     mock_update = RadioThermUpdate(tstat={"temp": 72.0}, humidity=45)
 
-    with patch(
-        "custom_components.radiotherm.coordinator.async_get_data",
-        AsyncMock(return_value=mock_update),
-    ) as mock_get_data:
+    with (
+        patch(
+            "custom_components.radiotherm.coordinator.async_get_data",
+            AsyncMock(return_value=mock_update),
+        ) as mock_get_data,
+        patch(
+            "custom_components.radiotherm.coordinator.async_set_time", AsyncMock()
+        ) as mock_set_time,
+    ):
         result = await coordinator._async_update_data()
 
         assert result == mock_update
         mock_get_data.assert_called_once_with(mock_hass, mock_init_data.tstat)
+        mock_set_time.assert_called_once()
 
 
 @pytest.mark.asyncio

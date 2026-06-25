@@ -1,11 +1,12 @@
 """Test Radio Thermostat config flow."""
 
-from unittest.mock import MagicMock, AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
 
 from custom_components.radiotherm.config_flow import (
-    RadioThermConfigFlow,
     CannotConnect,
+    RadioThermConfigFlow,
 )
 
 
@@ -168,3 +169,34 @@ async def test_step_confirm(mock_hass):
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["title"] == "Living Room"
     assert result["data"] == {"host": "192.168.1.101"}
+
+
+@pytest.mark.asyncio
+async def test_options_flow(mock_hass):
+    """Test options flow."""
+    entry = MagicMock()
+    entry.options = {"sync_time": False}
+
+    from custom_components.radiotherm.config_flow import RadioThermOptionsFlowHandler
+
+    handler = RadioThermOptionsFlowHandler(entry)
+    handler.hass = mock_hass
+    handler.async_show_form = MagicMock(
+        return_value={"type": FlowResultType.FORM, "step_id": "init"}
+    )
+    handler.async_create_entry = MagicMock(
+        side_effect=lambda title, data: {
+            "type": FlowResultType.CREATE_ENTRY,
+            "data": data,
+        }
+    )
+
+    # Initial step
+    result = await handler.async_step_init()
+    assert result["type"] == FlowResultType.FORM
+    assert result["step_id"] == "init"
+
+    # Submit options
+    result = await handler.async_step_init(user_input={"sync_time": True})
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["data"] == {"sync_time": True}

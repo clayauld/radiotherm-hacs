@@ -1,15 +1,17 @@
 """Test initialization of Radio Thermostat integration."""
 
-from unittest.mock import MagicMock, patch, AsyncMock
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
 
 import custom_components.radiotherm as radiotherm_init
 
 
 class MockConfigEntry:
-    def __init__(self, data=None, entry_id="test_entry"):
+    def __init__(self, data=None, entry_id="test_entry", options=None):
         self.data = data or {"host": "192.168.1.100"}
         self.entry_id = entry_id
+        self.options = options or {}
         self.runtime_data = None
         self.update_listeners = []
 
@@ -77,14 +79,14 @@ async def test_async_setup_entry_no_hold(mock_hass):
         mock_get_init.assert_called_once_with(mock_hass, "192.168.1.100")
         mock_coord_class.assert_called_once_with(mock_hass, entry, mock_init_data)
         mock_coordinator.async_config_entry_first_refresh.assert_called_once()
-        mock_set_time.assert_called_once_with(mock_hass, mock_init_data.tstat)
+        mock_set_time.assert_not_called()
         mock_hass.config_entries.async_forward_entry_setups.assert_called_once()
 
 
 @pytest.mark.asyncio
-async def test_async_setup_entry_with_hold(mock_hass):
-    """Test async_setup_entry when hold is True (should not sync time)."""
-    entry = MockConfigEntry()
+async def test_async_setup_entry_with_sync_disabled(mock_hass):
+    """Test async_setup_entry when sync_time is False."""
+    entry = MockConfigEntry(options={"sync_time": False})
 
     # Mock init data
     mock_init_data = MagicMock()

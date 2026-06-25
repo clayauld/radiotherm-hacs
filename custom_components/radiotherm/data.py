@@ -1,13 +1,12 @@
 """The Radio Thermostat integration data."""
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 import radiotherm
-from radiotherm.thermostat import CommonThermostat
-
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
+from radiotherm.thermostat import CommonThermostat
 
 from .const import TIMEOUT
 
@@ -47,7 +46,9 @@ def _get_init_data(host: str) -> RadioThermInitData:
 
 async def async_get_init_data(hass: HomeAssistant, host: str) -> RadioThermInitData:
     """Get the RadioInitData."""
-    return await hass.async_add_executor_job(_get_init_data, host)
+    return cast(
+        RadioThermInitData, await hass.async_add_executor_job(_get_init_data, host)
+    )
 
 
 def _get_data(device: CommonThermostat) -> RadioThermUpdate:
@@ -70,4 +71,4 @@ async def async_get_data(
     hass: HomeAssistant, device: CommonThermostat
 ) -> RadioThermUpdate:
     """Fetch the data from the thermostat."""
-    return await hass.async_add_executor_job(_get_data, device)
+    return cast(RadioThermUpdate, await hass.async_add_executor_job(_get_data, device))
