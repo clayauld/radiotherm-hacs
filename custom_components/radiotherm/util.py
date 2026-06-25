@@ -1,6 +1,5 @@
 """Utils for radiotherm."""
 
-import json
 import logging
 
 from radiotherm.thermostat import CommonThermostat
@@ -36,7 +35,9 @@ def _set_time(device: CommonThermostat, hold: bool) -> None:
         return
     except Exception as ex:
         _LOGGER.debug(
-            "Failed to set thermostat time via /sys/time, falling back to /tstat: %s", ex
+            "Failed to set thermostat time via /sys/time, "
+            "falling back to /tstat: %s",
+            ex,
         )
 
     # Fallback to /tstat which is known to work but clears hold/override
