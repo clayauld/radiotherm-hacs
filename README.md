@@ -3,13 +3,14 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 [![Test Suite](https://github.com/clayauld/radiotherm-hacs/actions/workflows/test.yml/badge.svg)](https://github.com/clayauld/radiotherm-hacs/actions/workflows/test.yml)
 
-A custom integration for wifi-enabled Radio Thermostat devices (Filtrete 3M50, CT30, CT50, CT80, CT80 Plus, etc.) in Home Assistant. This is a local polling integration that maintains support for modern Home Assistant Climate architectures (specifically addressing the required `TURN_ON` and `TURN_OFF` features in Core 2024.2+).
+A replacement for the official Radio Thermostat integration. It works with wifi-enabled Radio Thermostat devices (Filtrete 3M50, CT30, CT50, CT80, CT80 Plus, etc.) in Home Assistant. This is a local polling integration that maintains support for modern Home Assistant Climate architectures (specifically addressing the required `TURN_ON` and `TURN_OFF` features in Core 2024.2+).
 
 ## Features
 
 - **Climate Entity:** Control target temperature, operation modes (heat, cool, auto, off), and fan modes (on, auto, circulate).
 - **Hold Switch:** Toggle permanent hold on/off.
 - **Local Control:** Communicates directly with the thermostat's API over your local network.
+- **Time Synchronization:** Automatically syncs the thermostat's clock every 24 hours. This behavior can be toggled on/off in the integration options, or manually triggered at any time using the `climate.sync_time` service.
 - **Modern Compatibility:** Native support for the modern `ClimateEntityFeature` bitmasks.
 
 ## Versatile Thermostat Compatibility
@@ -37,17 +38,29 @@ The integration is configured via the Home Assistant user interface:
 1. Go to **Settings -> Devices & Services**.
 2. Click **Add Integration** in the bottom-right.
 3. Search for **Radio Thermostat** and enter your thermostat's IP address.
+4. **Options Flow**: You can configure Options by clicking **Configure** on the integration card to toggle the automatic time synchronization behavior.
 
 ## Development
 
-### Running Tests
-To set up dependencies and run tests:
+### Setup Dev Environment
+This project uses [uv](https://github.com/astral-sh/uv) to manage its virtual environment and dependencies. To set up the virtual environment:
 ```bash
-pip install -r requirements.txt
+make venv
+```
+
+### Running Tests
+To run the test suite:
+```bash
 make test
 ```
 
-### Running Linting
+### Running Formatters and Linters
+To automatically format the code:
+```bash
+make format
+```
+
+To run linting checks (flake8, black, isort, mypy, bandit):
 ```bash
 make lint
 ```
