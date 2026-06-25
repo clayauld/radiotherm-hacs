@@ -332,8 +332,8 @@ class MockConfigFlow:
 
 
 class MockOptionsFlow:
-    def __init__(self, *args, **kwargs):
-        pass
+    def __init__(self, config_entry, *args, **kwargs):
+        self.config_entry = config_entry
 
     def __init_subclass__(cls, **kwargs):
         pass
