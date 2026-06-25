@@ -1,11 +1,12 @@
 """Test Radio Thermostat config flow."""
 
-from unittest.mock import MagicMock, AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
 
 from custom_components.radiotherm.config_flow import (
-    RadioThermConfigFlow,
     CannotConnect,
+    RadioThermConfigFlow,
 )
 
 

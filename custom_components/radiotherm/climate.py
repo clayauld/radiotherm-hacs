@@ -2,13 +2,7 @@
 
 from typing import Any
 
-try:
-    from typing import override
-except ImportError:
-    from typing_extensions import override
-
 import radiotherm
-
 from homeassistant.components.climate import (
     FAN_AUTO,
     FAN_OFF,
@@ -24,6 +18,7 @@ from homeassistant.const import ATTR_TEMPERATURE, PRECISION_HALVES, UnitOfTemper
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from typing_extensions import override
 
 from .coordinator import RadioThermConfigEntry, RadioThermUpdateCoordinator
 from .entity import RadioThermostatEntity
@@ -93,7 +88,7 @@ PARALLEL_UPDATES = 1
 CONF_HOLD_TEMP = "hold_temp"
 
 
-def round_temp(temperature):
+def round_temp(temperature: float) -> float:
     """Round a temperature to the resolution of the thermostat.
 
     RadioThermostats can handle 0.5 degree temps so the input
@@ -143,7 +138,7 @@ class RadioThermostat(RadioThermostatEntity, ClimateEntity):
         self._attr_supported_features |= ClimateEntityFeature.PRESET_MODE
         self._attr_preset_modes = PRESET_MODES
 
-    @override
+    @override  # type: ignore[misc]
     async def async_set_fan_mode(self, fan_mode: str) -> None:
         """Turn fan on/off."""
         if (code := FAN_MODE_TO_CODE.get(fan_mode)) is None:
@@ -157,8 +152,8 @@ class RadioThermostat(RadioThermostatEntity, ClimateEntity):
         """Turn fan on/off."""
         self.device.fmode = code
 
-    @callback
-    @override
+    @callback  # type: ignore[misc]
+    @override  # type: ignore[misc]
     def _process_data(self) -> None:
         """Update and validate the data from the thermostat."""
         data = self.data.tstat
@@ -189,7 +184,7 @@ class RadioThermostat(RadioThermostatEntity, ClimateEntity):
             elif self.hvac_action == HVACAction.HEATING:
                 self._attr_target_temperature = data["t_heat"]
 
-    @override
+    @override  # type: ignore[misc]
     async def async_set_temperature(self, **kwargs: Any) -> None:
         """Set new target temperature."""
         if (temperature := kwargs.get(ATTR_TEMPERATURE)) is None:
@@ -199,7 +194,7 @@ class RadioThermostat(RadioThermostatEntity, ClimateEntity):
         self.async_write_ha_state()
         await self.coordinator.async_request_refresh()
 
-    def _set_temperature(self, temperature: int) -> None:
+    def _set_temperature(self, temperature: float) -> None:
         """Set new target temperature."""
         temperature = round_temp(temperature)
         if self.hvac_mode == HVACMode.COOL:
@@ -212,7 +207,7 @@ class RadioThermostat(RadioThermostatEntity, ClimateEntity):
             elif self.hvac_action == HVACAction.HEATING:
                 self.device.t_heat = temperature
 
-    @override
+    @override  # type: ignore[misc]
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         """Set operation mode (auto, cool, heat, off)."""
         await self.hass.async_add_executor_job(self._set_hvac_mode, hvac_mode)
@@ -230,7 +225,7 @@ class RadioThermostat(RadioThermostatEntity, ClimateEntity):
         elif hvac_mode == HVACMode.HEAT:
             self.device.t_heat = self.target_temperature
 
-    @override
+    @override  # type: ignore[misc]
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Set Preset mode (Home, Alternate, Away, Holiday)."""
         if preset_mode not in PRESET_MODES:
@@ -242,7 +237,8 @@ class RadioThermostat(RadioThermostatEntity, ClimateEntity):
 
     def _set_preset_mode(self, preset_mode: str) -> None:
         """Set Preset mode (Home, Alternate, Away, Holiday)."""
-        assert isinstance(self.device, radiotherm.thermostat.CT80)
+        if not isinstance(self.device, radiotherm.thermostat.CT80):
+            raise TypeError("Device is not a CT80 thermostat")
         self.device.program_mode = PRESET_MODE_TO_CODE[preset_mode]
 
     async def async_sync_time(self) -> None:

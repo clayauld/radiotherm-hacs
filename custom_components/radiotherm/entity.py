@@ -1,16 +1,13 @@
 """The Radio Thermostat integration base entity."""
 
 from abc import abstractmethod
-
-try:
-    from typing import override
-except ImportError:
-    from typing_extensions import override
+from typing import cast
 
 from homeassistant.core import callback
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from typing_extensions import override
 
 from .coordinator import RadioThermUpdateCoordinator
 from .data import RadioThermUpdate
@@ -38,15 +35,15 @@ class RadioThermostatEntity(CoordinatorEntity[RadioThermUpdateCoordinator]):
     @property
     def data(self) -> RadioThermUpdate:
         """Returnt the last update."""
-        return self.coordinator.data
+        return cast(RadioThermUpdate, self.coordinator.data)
 
-    @callback
+    @callback  # type: ignore[misc]
     @abstractmethod
     def _process_data(self) -> None:
         """Update and validate the data from the thermostat."""
 
-    @callback
-    @override
+    @callback  # type: ignore[misc]
+    @override  # type: ignore[misc]
     def _handle_coordinator_update(self) -> None:
         self._process_data()
-        return super()._handle_coordinator_update()
+        super()._handle_coordinator_update()

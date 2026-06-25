@@ -2,11 +2,10 @@
 
 import logging
 
-from radiotherm.thermostat import CommonThermostat
-from radiotherm.validate import validate_response
-
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
+from radiotherm.thermostat import CommonThermostat
+from radiotherm.validate import validate_response
 
 _LOGGER = logging.getLogger(__name__)
 

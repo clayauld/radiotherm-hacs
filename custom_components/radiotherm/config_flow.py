@@ -2,16 +2,9 @@
 
 import logging
 from typing import Any, Optional
-
-try:
-    from typing import override
-except ImportError:
-    from typing_extensions import override
 from urllib.error import URLError
 
-from radiotherm.validate import RadiothermTstatError
 import voluptuous as vol
-
 from homeassistant.config_entries import (
     ConfigEntry,
     ConfigFlow,
@@ -22,6 +15,8 @@ from homeassistant.const import CONF_HOST
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
+from radiotherm.validate import RadiothermTstatError
+from typing_extensions import override
 
 from .const import CONF_SYNC_TIME, DOMAIN
 from .data import RadioThermInitData, async_get_init_data
@@ -41,13 +36,13 @@ async def validate_connection(hass: HomeAssistant, host: str) -> RadioThermInitD
         raise CannotConnect(f"Failed to connect to {host}: {ex}") from ex
 
 
-class RadioThermConfigFlow(ConfigFlow, domain=DOMAIN):
+class RadioThermConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
     """Handle a config flow for Radio Thermostat."""
 
     VERSION = 1
 
     @staticmethod
-    @callback
+    @callback  # type: ignore[misc]
     def async_get_options_flow(
         config_entry: ConfigEntry,
     ) -> OptionsFlow:
@@ -59,7 +54,7 @@ class RadioThermConfigFlow(ConfigFlow, domain=DOMAIN):
         self.discovered_ip: Optional[str] = None
         self.discovered_init_data: Optional[RadioThermInitData] = None
 
-    @override
+    @override  # type: ignore[misc]
     async def async_step_dhcp(
         self, discovery_info: DhcpServiceInfo
     ) -> ConfigFlowResult:
@@ -83,8 +78,8 @@ class RadioThermConfigFlow(ConfigFlow, domain=DOMAIN):
         """Attempt to confirm."""
         ip_address = self.discovered_ip
         init_data = self.discovered_init_data
-        assert ip_address is not None
-        assert init_data is not None
+        if ip_address is None or init_data is None:
+            raise ValueError("IP address or initial data is missing")
         if user_input is not None:
             return self.async_create_entry(
                 title=init_data.name,
@@ -103,7 +98,7 @@ class RadioThermConfigFlow(ConfigFlow, domain=DOMAIN):
             description_placeholders=placeholders,
         )
 
-    @override
+    @override  # type: ignore[misc]
     async def async_step_user(
         self, user_input: Optional[dict[str, Any]] = None
     ) -> ConfigFlowResult:

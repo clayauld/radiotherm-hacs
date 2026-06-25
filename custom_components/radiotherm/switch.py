@@ -2,14 +2,10 @@
 
 from typing import Any
 
-try:
-    from typing import override
-except ImportError:
-    from typing_extensions import override
-
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from typing_extensions import override
 
 from .coordinator import RadioThermConfigEntry, RadioThermUpdateCoordinator
 from .entity import RadioThermostatEntity

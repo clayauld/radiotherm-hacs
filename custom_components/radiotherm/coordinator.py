@@ -1,26 +1,21 @@
 """Coordinator for radiotherm."""
 
-from datetime import datetime, timedelta
 import logging
-
-try:
-    from typing import override
-except ImportError:
-    from typing_extensions import override
+from datetime import datetime, timedelta
 from urllib.error import URLError
-
-from radiotherm.validate import RadiothermTstatError
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
+from radiotherm.validate import RadiothermTstatError
+from typing_extensions import TypeAlias, override
 
 from .const import CONF_SYNC_TIME
 from .data import RadioThermInitData, RadioThermUpdate, async_get_data
 from .util import async_set_time
 
-RadioThermConfigEntry = ConfigEntry["RadioThermUpdateCoordinator"]
+RadioThermConfigEntry: TypeAlias = ConfigEntry["RadioThermUpdateCoordinator"]
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -51,7 +46,7 @@ class RadioThermUpdateCoordinator(DataUpdateCoordinator[RadioThermUpdate]):
             update_interval=UPDATE_INTERVAL,
         )
 
-    @override
+    @override  # type: ignore[misc]
     async def _async_update_data(self) -> RadioThermUpdate:
         """Update data from the thermostat."""
         try:
@@ -65,8 +60,8 @@ class RadioThermUpdateCoordinator(DataUpdateCoordinator[RadioThermUpdate]):
         except (OSError, URLError) as ex:
             msg = f"{self._description} connection error: {ex}"
             raise UpdateFailed(msg) from ex
-
-        if self.config_entry.options.get(CONF_SYNC_TIME, True):
+        options = self.config_entry.options  # type: ignore[attr-defined]
+        if options.get(CONF_SYNC_TIME, True):
             now = dt_util.utcnow()
             if (
                 self._last_time_sync is None

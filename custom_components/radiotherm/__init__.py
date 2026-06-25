@@ -1,14 +1,13 @@
 """The Radio Thermostat integration."""
 
 from collections.abc import Coroutine
-from typing import Any, TypeVar
+from typing import Any, TypeVar, cast
 from urllib.error import URLError
-
-from radiotherm.validate import RadiothermTstatError
 
 from homeassistant.const import CONF_HOST, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
+from radiotherm.validate import RadiothermTstatError
 
 from .coordinator import RadioThermConfigEntry, RadioThermUpdateCoordinator
 from .data import async_get_init_data
@@ -25,8 +24,8 @@ try:
     )
     from homeassistant.components.climate import ClimateEntityFeature
 
-    @property
-    def patched_supported_features(self) -> ClimateEntityFeature:
+    @property  # type: ignore[misc]
+    def patched_supported_features(self: Any) -> ClimateEntityFeature:
         """Get supported features, casting raw ints to ClimateEntityFeature."""
         features = self.get_underlying_attribute("supported_features")
         if features is not None:
@@ -34,7 +33,7 @@ try:
         return ClimateEntityFeature(0)
 
     UnderlyingClimate.supported_features = patched_supported_features
-except Exception:  # pylint: disable=broad-except
+except Exception:  # pylint: disable=broad-except  # nosec B110
     pass
 
 
@@ -82,4 +81,6 @@ async def _async_update_listener(
 
 async def async_unload_entry(hass: HomeAssistant, entry: RadioThermConfigEntry) -> bool:
     """Unload a config entry."""
-    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    return cast(
+        bool, await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    )

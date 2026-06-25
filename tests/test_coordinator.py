@@ -1,15 +1,16 @@
 """Test coordinator of Radio Thermostat integration."""
 
-from unittest.mock import MagicMock, patch, AsyncMock
-import pytest
+from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+from homeassistant.helpers.update_coordinator import UpdateFailed
 from radiotherm.validate import RadiothermTstatError
+
 from custom_components.radiotherm.coordinator import (
-    RadioThermUpdateCoordinator,
     UPDATE_INTERVAL,
+    RadioThermUpdateCoordinator,
 )
 from custom_components.radiotherm.data import RadioThermUpdate
-from homeassistant.helpers.update_coordinator import UpdateFailed
 
 
 @pytest.fixture

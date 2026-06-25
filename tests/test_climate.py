@@ -1,14 +1,15 @@
 """Test climate platform of Radio Thermostat integration."""
 
-from unittest.mock import MagicMock, patch, AsyncMock
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
 import radiotherm
 
 from custom_components.radiotherm.climate import (
-    RadioThermostat,
-    HVACMode,
-    ClimateEntityFeature,
     PRESET_HOME,
+    ClimateEntityFeature,
+    HVACMode,
+    RadioThermostat,
 )
 
 
