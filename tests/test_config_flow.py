@@ -59,8 +59,34 @@ async def test_step_user_success(mock_hass):
 
         assert result["type"] == FlowResultType.CREATE_ENTRY
         assert result["title"] == "Living Room"
-        assert result["data"] == user_input
+        assert result["data"] == {"host": "192.168.1.100"}
+        assert result["options"] == {"sync_time": True}
         mock_validate.assert_called_once_with(mock_hass, "192.168.1.100")
+
+
+@pytest.mark.asyncio
+async def test_step_user_success_sync_disabled(mock_hass):
+    """Test user step with valid input and sync_time disabled."""
+    flow = RadioThermConfigFlow()
+    flow.hass = mock_hass
+
+    mock_init_data = MagicMock()
+    mock_init_data.name = "Living Room"
+    mock_init_data.mac = "00:11:22:33:44:55"
+    mock_init_data.host = "192.168.1.100"
+
+    user_input = {"host": "192.168.1.100", "sync_time": False}
+
+    with patch(
+        "custom_components.radiotherm.config_flow.validate_connection",
+        AsyncMock(return_value=mock_init_data),
+    ):
+        result = await flow.async_step_user(user_input)
+
+        assert result["type"] == FlowResultType.CREATE_ENTRY
+        assert result["title"] == "Living Room"
+        assert result["data"] == {"host": "192.168.1.100"}
+        assert result["options"] == {"sync_time": False}
 
 
 @pytest.mark.asyncio
@@ -169,6 +195,7 @@ async def test_step_confirm(mock_hass):
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["title"] == "Living Room"
     assert result["data"] == {"host": "192.168.1.101"}
+    assert result["options"] == {"sync_time": True}
 
 
 @pytest.mark.asyncio

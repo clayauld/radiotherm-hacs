@@ -327,12 +327,24 @@ class MockConfigFlow:
             "description_placeholders": description_placeholders or {},
         }
 
-    def async_create_entry(self, title, data):
-        return {"type": "create_entry", "title": title, "data": data}
+    def async_create_entry(
+        self,
+        title,
+        data,
+        description=None,
+        description_placeholders=None,
+        options=None,
+    ):
+        return {
+            "type": "create_entry",
+            "title": title,
+            "data": data,
+            "options": options,
+        }
 
 
 class MockOptionsFlow:
-    def __init__(self, config_entry, *args, **kwargs):
+    def __init__(self, config_entry=None, *args, **kwargs):
         self.config_entry = config_entry
 
     def __init_subclass__(cls, **kwargs):
@@ -348,8 +360,20 @@ class MockOptionsFlow:
             "description_placeholders": description_placeholders or {},
         }
 
-    def async_create_entry(self, title, data):
-        return {"type": "create_entry", "title": title, "data": data}
+    def async_create_entry(
+        self,
+        title,
+        data,
+        description=None,
+        description_placeholders=None,
+        options=None,
+    ):
+        return {
+            "type": "create_entry",
+            "title": title,
+            "data": data,
+            "options": options,
+        }
 
 
 config_entries.ConfigFlow = MockConfigFlow

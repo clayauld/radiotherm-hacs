@@ -47,7 +47,7 @@ class RadioThermConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
         config_entry: ConfigEntry,
     ) -> OptionsFlow:
         """Create the options flow."""
-        return RadioThermOptionsFlowHandler(config_entry)
+        return RadioThermOptionsFlowHandler()
 
     def __init__(self) -> None:
         """Initialize ConfigFlow."""
@@ -84,6 +84,7 @@ class RadioThermConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
             return self.async_create_entry(
                 title=init_data.name,
                 data={CONF_HOST: ip_address},
+                options={CONF_SYNC_TIME: True},
             )
 
         self._set_confirm_only()
@@ -120,22 +121,24 @@ class RadioThermConfigFlow(ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
                 )
                 return self.async_create_entry(
                     title=init_data.name,
-                    data=user_input,
+                    data={CONF_HOST: user_input[CONF_HOST]},
+                    options={CONF_SYNC_TIME: user_input.get(CONF_SYNC_TIME, True)},
                 )
 
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema({vol.Required(CONF_HOST): str}),
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_HOST): str,
+                    vol.Optional(CONF_SYNC_TIME, default=True): bool,
+                }
+            ),
             errors=errors,
         )
 
 
 class RadioThermOptionsFlowHandler(OptionsFlow):
     """Handle Radio Thermostat options."""
-
-    def __init__(self, config_entry: ConfigEntry) -> None:
-        """Initialize options flow."""
-        super().__init__(config_entry)
 
     async def async_step_init(
         self, user_input: Optional[dict[str, Any]] = None
