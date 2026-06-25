@@ -1,0 +1,3 @@
+sync_time:
+  name: Sync time
+  description: Synchronize the time on the thermostat.
