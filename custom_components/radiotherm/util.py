@@ -30,8 +30,7 @@ def _set_time(device: CommonThermostat, hold: bool) -> None:
 
     # Try setting time via /sys/time which doesn't clear hold/override
     try:
-        data = json.dumps(time_data).encode("utf-8")
-        response = device.post("/sys/time", data)
+        response = device.post("/sys/time", time_data)
         validate_response(response)
         _LOGGER.debug("Set thermostat time via /sys/time")
         return
