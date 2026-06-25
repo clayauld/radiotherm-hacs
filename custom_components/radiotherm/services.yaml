@@ -1,3 +1,7 @@
 sync_time:
-  name: Sync time
-  description: Synchronize the time on the thermostat.
+  name: Sync Time
+  description: Synchronize the thermostat's internal clock with Home Assistant.
+  target:
+    entity:
+      integration: radiotherm
+      domain: climate

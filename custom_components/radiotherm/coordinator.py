@@ -82,6 +82,5 @@ class RadioThermUpdateCoordinator(DataUpdateCoordinator[RadioThermUpdate]):
                     _LOGGER.warning(
                         "Failed to sync time for %s: %s", self._description, ex
                     )
-                    self._last_time_sync = now
 
         return data
