@@ -9,9 +9,10 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from radiotherm.validate import RadiothermTstatError
 
+from .const import CONF_SYNC_TIME, DOMAIN
 from .coordinator import RadioThermConfigEntry, RadioThermUpdateCoordinator
 from .data import async_get_init_data
-from .util import async_set_time  # noqa: F401
+from .util import async_set_time
 
 PLATFORMS: list[Platform] = [Platform.CLIMATE, Platform.SWITCH]
 

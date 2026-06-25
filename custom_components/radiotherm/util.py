@@ -1,5 +1,6 @@
 """Utils for radiotherm."""
 
+import json
 import logging
 
 from homeassistant.core import HomeAssistant
@@ -28,15 +29,14 @@ def _set_time(device: CommonThermostat, hold: bool) -> None:
 
     # Try setting time via /sys/time which doesn't clear hold/override
     try:
-        response = device.post("/sys/time", time_data)
+        data = json.dumps(time_data).encode("utf-8")
+        response = device.post("/sys/time", data)
         validate_response(response)
         _LOGGER.debug("Set thermostat time via /sys/time")
         return
     except Exception as ex:
         _LOGGER.debug(
-            "Failed to set thermostat time via /sys/time, "
-            "falling back to /tstat: %s",
-            ex,
+            "Failed to set thermostat time via /sys/time, falling back to /tstat: %s", ex
         )
 
     # Fallback to /tstat which is known to work but clears hold/override
