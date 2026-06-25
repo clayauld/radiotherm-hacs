@@ -331,4 +331,26 @@ class MockConfigFlow:
         return {"type": "create_entry", "title": title, "data": data}
 
 
+class MockOptionsFlow:
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __init_subclass__(cls, **kwargs):
+        pass
+
+    def async_show_form(
+        self, step_id, data_schema=None, errors=None, description_placeholders=None
+    ):
+        return {
+            "type": "form",
+            "step_id": step_id,
+            "errors": errors or {},
+            "description_placeholders": description_placeholders or {},
+        }
+
+    def async_create_entry(self, title, data):
+        return {"type": "create_entry", "title": title, "data": data}
+
+
 config_entries.ConfigFlow = MockConfigFlow
+config_entries.OptionsFlow = MockOptionsFlow
